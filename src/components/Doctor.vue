@@ -141,6 +141,7 @@ export default {
           .then(() => {
             this.showSnack = true;
             this.snackText = "Доктор создан";
+            this.$refs.form.reset();
           });
       }
     }
