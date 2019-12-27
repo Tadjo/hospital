@@ -3,8 +3,13 @@ var express = require("express");
 var router = express.Router();
 
 // load all patients
-router.get("/", function(req, res) {
-  res.send("all patients");
+router.get("/", async function(req, res) {
+  try {
+    const patients = await models.Patient.findAll();
+    res.json({ data: patients });
+  } catch (error) {
+    res.status(500).json(error);
+  }
 });
 // define the about route
 router.post("/", async function(req, res) {
@@ -17,17 +22,17 @@ router.post("/", async function(req, res) {
     chamber,
     gender
   } = req.body;
-  try {      
-      const patient = await models.Patient.create({
-        firstName,
-        lastName,
-        middleName,
-        datein,
-        dateout,
-        chamber,
-        gender
-      });
-      res.json(patient);
+  try {
+    const patient = await models.Patient.create({
+      firstName,
+      lastName,
+      middleName,
+      datein,
+      dateout,
+      chamber,
+      gender
+    });
+    res.json(patient);
   } catch (error) {
     res.status(500).json(error);
   }

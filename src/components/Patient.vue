@@ -117,7 +117,7 @@ export default {
           dateout,
           chamber,
           gender
-        });
+        }).then(() => this.$router.push('/'));
       }
     }
   }

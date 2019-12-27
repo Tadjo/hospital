@@ -35,7 +35,7 @@
     <v-data-table
       :headers="headers"
       :items="items"
-      :items-per-page="20"
+      :disable-pagination="true"
       class="patients-table"
       @click:row="onRowClick"
     ></v-data-table>
@@ -49,41 +49,10 @@ export default {
       search: "",
       headers: [
         { text: "ФИО", value: "fio" },
-        { text: "Врач", value: "dc" },
-        { text: "Диагноз", value: "di" },
         { text: "Дата поступления", value: "datein" },
         { text: "Дата выписки", value: "dateout" },
-        { text: "Палата", value: "appartment" }
+        { text: "Палата", value: "chamber" }
       ],
-      data: [
-        {
-          id: 1,
-          fio: "AAA",
-          di: "a",
-          dc: "HOUSE1",
-          datein: randomDate(new Date(2012, 0, 1), new Date()).toDateString(),
-          dateout: randomDate(new Date(2012, 0, 1), new Date()).toDateString(),
-          appartment: "1"
-        },
-        {
-          id: 2,
-          fio: "BBB",
-          di: "b",
-          dc: "HOUSE2",
-          datein: randomDate(new Date(2012, 0, 1), new Date()).toDateString(),
-          dateout: randomDate(new Date(2012, 0, 1), new Date()).toDateString(),
-          appartment: "2"
-        },
-        {
-          id: 3,
-          fio: "CCC",
-          di: "c",
-          dc: "HOUSE3",
-          datein: randomDate(new Date(2012, 0, 1), new Date()).toDateString(),
-          dateout: randomDate(new Date(2012, 0, 1), new Date()).toDateString(),
-          appartment: "3"
-        }
-      ]
     };
   },
   computed: {
@@ -94,24 +63,29 @@ export default {
       return this.$store.getters.isLoggedIn
     },
     items() {
-      return this.data.filter(
+      const patients =  (this.$store.getters.patients || []).map(p => {
+        p.fio = `${p.firstName} ${p.lastName} ${p.middleName}`,
+        p.datein = p.datein && new Date(p.datein).toLocaleDateString();
+        p.dateout = p.dateout && new Date(p.dateout).toLocaleDateString();
+        return p;
+      });
+      return this.search.trim() ? patients.filter(
         it =>
-          it.fio.toLowerCase().includes(this.search.trim().toLowerCase()) ||
-          it.dc.toLowerCase().includes(this.search.trim().toLowerCase())
-      );
+          it.fio.toLowerCase().includes(this.search.trim().toLowerCase())
+      ) : patients;
     }
   },
   methods: {
     onRowClick(patient) {
       this.$router.push(`patient/${patient.id}/history`);
     }
+  },
+  mounted() {
+    if (!this.$store.getters.patients.length) {
+      this.$store.dispatch("getPatients");
+    }
   }
 };
-function randomDate(start, end) {
-  return new Date(
-    start.getTime() + Math.random() * (end.getTime() - start.getTime())
-  );
-}
 </script>
 
 <style>

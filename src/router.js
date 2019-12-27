@@ -6,6 +6,7 @@ import Patients from "./components/Patients.vue";
 import Patient from "./components/Patient.vue";
 import PatientHistory from "./components/History.vue";
 import Doctor from "./components/Doctor.vue";
+import store from "./store"
 
 Vue.use(VueRouter);
 const router = new VueRouter({
@@ -58,4 +59,15 @@ const router = new VueRouter({
     { path: "*", redirect: "/" }
   ]
 });
+router.beforeEach((to, from, next) => {
+  if(to.matched.some(record => record.meta.requiresAuth)) {
+    if (store.getters.isLoggedIn) {
+      next()
+      return
+    }
+    next(false)
+  } else {
+    next() 
+  }
+})
 export default router;

@@ -1,20 +1,23 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
+import decodeJWT from 'jwt-decode'
 
 Vue.use(Vuex);
+const token = localStorage.getItem("token");
 
 export default new Vuex.Store({
   state: {
     status: "",
-    token: localStorage.getItem("token") || "",
-    user: {}
+    token: token || "",
+    user: decodeJWT(token) || "",
+    patients: []
   },
   mutations: {
     auth_request(state) {
       state.status = "loading";
     },
-    auth_success(state, {token, user}) {
+    auth_success(state, { token, user }) {
       state.status = "success";
       state.token = token;
       state.user = user;
@@ -26,8 +29,8 @@ export default new Vuex.Store({
       state.status = "";
       state.token = "";
     },
-    create_patient(state, patient) {
-        console.log(patient);
+    get_patients(state, patients) {
+      state.patients = patients;
     }
   },
   actions: {
@@ -44,7 +47,7 @@ export default new Vuex.Store({
             const user = resp.data.user;
             localStorage.setItem("token", token);
             axios.defaults.headers.common["Authorization"] = token;
-            commit("auth_success", {token, user});
+            commit("auth_success", { token, user });
             resolve(resp);
           })
           .catch(err => {
@@ -78,27 +81,35 @@ export default new Vuex.Store({
       });
     },
     logout({ commit }) {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         commit("logout");
         localStorage.removeItem("token");
         delete axios.defaults.headers.common["Authorization"];
         resolve();
       });
     },
-    createPatient({commit}, patient) {
-        axios({
-            url: "http://localhost:8081/patients",
-            data: patient,
-            method: "POST"
-        }).then(res => {
-              commit('create_patient');
-              console.log(res);
-          })
+    createPatient({ dispatch}, patient) {
+      axios({
+        url: "http://localhost:8081/patients",
+        data: patient,
+        method: "POST"
+      }).then(() => {
+        dispatch("getPatients");
+      });
+    },
+    getPatients({ commit }) {
+      axios({
+        url: "http://localhost:8081/patients",
+        method: "GET"
+      }).then(res => {
+        commit("get_patients", res.data.data);
+      });
     }
   },
   getters: {
     isLoggedIn: state => !!state.token,
     authStatus: state => state.status,
-    user: state => state.user
+    user: state => state.user,
+    patients: state => state.patients
   }
 });
