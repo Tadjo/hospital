@@ -33,7 +33,7 @@ app.get("/users", function(req, res) {
 });
 
 // register route
-app.post("/register", function(req, res, next) {
+app.post("/register", async function(req, res, next) {
   const {
     firstName,
     lastName,
@@ -44,19 +44,23 @@ app.post("/register", function(req, res, next) {
     login,
     password
   } = req.body;
-  helpers
-    .createUser({
-      firstName,
-      lastName,
-      middleName,
-      position,
-      employmentDate,
-      room,
-      login,
-      password
-    })
-    .then(user => res.json({ user, msg: "account created successfully" }))
-    .catch(err => console.log(err));
+  const exist = await helpers.getUser({ login });
+  if (!exist) {
+    return helpers
+      .createUser({
+        firstName,
+        lastName,
+        middleName,
+        position,
+        employmentDate,
+        room,
+        login,
+        password
+      })
+      .then(user => res.json({ user, msg: "account created successfully" }))
+      .catch(err => console.log(err));
+  }
+  return res.status(409).json({message: 'Пользователь с таким ником уже зарегистрирован'});
 });
 
 // login route

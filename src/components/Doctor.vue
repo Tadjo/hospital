@@ -67,9 +67,9 @@
       <v-spacer></v-spacer>
       <v-btn @click="submit" color="primary">Создать</v-btn>
     </v-card-actions>
-    <v-snackbar v-model="showSnack" :right="true" :top="true">
+    <v-snackbar :color="snackColor" v-model="showSnack" :right="true" :top="true">
       {{ snackText }}
-      <v-btn color="success" text @click="showSnack = false">Close</v-btn>
+      <v-btn color="white" text @click="showSnack = false">Close</v-btn>
     </v-snackbar>
   </v-card>
 </template>
@@ -89,6 +89,7 @@ export default {
       confirm: "",
       showDatePicker: false,
       showSnack: false,
+      snackColor: 'success',
       snackText: "",
       rules: {
         required: value => !!value || "Заполните поле.",
@@ -139,9 +140,15 @@ export default {
             password
           })
           .then(() => {
+            this.snackColor = 'success';
             this.showSnack = true;
             this.snackText = "Доктор создан";
             this.$refs.form.reset();
+          })
+          .catch((res) => {
+            this.snackColor = 'error';
+            this.showSnack = true;
+            this.snackText =  (res.response && res.response.data && res.response.data.message) || "Серверная ошибка"
           });
       }
     }
