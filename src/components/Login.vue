@@ -1,17 +1,17 @@
 <template>
-  <div class="login-container">
+  <div class="login-container" @keyup.enter="submit">
     <h1>HOSPITAL</h1>
-    <v-form ref="form">
+    <v-form ref="form" >
       <v-container>
         <v-row>
           <v-col cols="24">
             <v-text-field
               v-model="login"
               prepend-icon="mdi-account"
-              :rules="[rules.required, rules.min]"
+              :rules="[rules.required, rules.loginMin]"
               name="input-10-2"
               label="Логин"
-              hint="At least 8 characters"
+              hint="Как минимум 8 символов"
               counter
             ></v-text-field>
             <v-text-field
@@ -44,22 +44,28 @@ export default {
       login: "admin",
       rules: {
         required: value => !!value || "Заполните поле.",
-        min: v => v.length >= 8 || "Введите как минимум 8 символов",
-        password: v => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/.test(v) || 'Пароль должен содержать как минимум 1 число, 1 маленькую и 1 большую букву'
+        loginMin: v => v.length >= 3 || v == 'admin' || "Введите как минимум 3 символов",
+        min: v => v.length >= 8 || v == 'admin' || "Введите как минимум 8 символов",
+        password: v =>
+          /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/.test(v) ||
+          "Пароль должен содержать как минимум 1 число, 1 маленькую и 1 большую букву"
       }
     };
   },
   methods: {
     submit() {
-      if (this.password === "root" && this.login === "admin") {
-        this.$router.push("/");
-      } else {
-          if (this.$refs.form.validate()) {
-              // to do
-          }
+      // if (this.password === "root" && this.login === "admin") {
+      //   this.$router.push("/");
+      // } else {
+        if (this.$refs.form.validate()) {
+          this.$store
+            .dispatch("login", { login: this.login, password: this.password })
+            .then(() => this.$router.push("/"))
+            .catch(err => console.log(err));
+        }
       }
     }
-  }
+  // }
 };
 </script>
 

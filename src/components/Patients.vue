@@ -3,7 +3,7 @@
     <v-card-title>
       Patients
       <v-spacer></v-spacer>
-      <router-link to="patient/add">
+      <router-link to="patient/add" v-if="isLoggedIn && !isAdmin">
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-btn x-small fab dark color="primary" v-on="on">
@@ -13,7 +13,7 @@
           <span>Добавить Пациента</span>
         </v-tooltip>
       </router-link>
-      <router-link to="doctor/add">
+      <router-link to="doctor/add" v-if="isLoggedIn && isAdmin">
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-btn x-small fab dark color="primary" v-on="on">
@@ -87,6 +87,12 @@ export default {
     };
   },
   computed: {
+    isAdmin() {
+      return this.$store.getters.user.login === 'admin'
+    },
+    isLoggedIn() {
+      return this.$store.getters.isLoggedIn
+    },
     items() {
       return this.data.filter(
         it =>

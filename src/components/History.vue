@@ -3,10 +3,18 @@
     <v-card class="card">
       <v-row>
         <v-col>
-          <h3>История болезней</h3>
+          <v-row>
+            <h3>История болезней</h3>
+            <v-btn style="margin-left: 10px" color="primary" fab x-small @click="add">
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </v-row>
           <v-data-table :headers="headers" :items="items" item-key="id" row @click:row="select">
             <template v-slot:item="props">
-              <tr @click="select(props.item)" :class="{'active': props.item.id == (patient && patient.id)}">
+              <tr
+                @click="select(props.item)"
+                :class="{'active': props.item.id == (patient && patient.id)}"
+              >
                 <td>{{props.item.diagnosis}}</td>
                 <td>{{props.item.dateIn}}</td>
                 <td>{{props.item.dateOut}}</td>
@@ -143,8 +151,6 @@ export default {
   },
   computed: {
     fdatein() {
-      // eslint-disable-next-line
-      console.log(this.patient);
       return this.patient.dateIn ? this.formatDate(this.patient.dateIn) : "-";
     },
     fdateout() {
@@ -160,6 +166,19 @@ export default {
     },
     select(patient) {
       this.patient = patient;
+    },
+    add() {
+      this.items = this.items.concat({
+        id: this.items.length + 1,
+        diagnosis: "Новая",
+        symptoms: "",
+        work: "",
+        directFrom: "",
+        dateIn: new Date().toISOString().substr(0, 10),
+        dateOut: null,
+        doctor: ""
+      });
+      this.patient = this.items[this.items.length - 1];
     }
   },
   mounted() {
@@ -176,6 +195,6 @@ tbody tr {
   padding: 20px;
 }
 tr.active {
-    background: #cfcfcf;
+  background: #cfcfcf;
 }
 </style>
