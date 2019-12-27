@@ -67,6 +67,10 @@
       <v-spacer></v-spacer>
       <v-btn @click="submit" color="primary">Создать</v-btn>
     </v-card-actions>
+    <v-snackbar v-model="showSnack" :right="true" :top="true">
+      {{ snackText }}
+      <v-btn color="success" text @click="showSnack = false">Close</v-btn>
+    </v-snackbar>
   </v-card>
 </template>
 
@@ -84,6 +88,8 @@ export default {
       password: "",
       confirm: "",
       showDatePicker: false,
+      showSnack: false,
+      snackText: "",
       rules: {
         required: value => !!value || "Заполните поле.",
         min: v => v.length >= 3 || "Введите как минимум 3 символов",
@@ -121,16 +127,21 @@ export default {
           login,
           password
         } = this;
-        this.$store.dispatch("register", {
-          firstName,
-          lastName,
-          middleName,
-          position,
-          employmentDate,
-          room,
-          login,
-          password
-        });
+        this.$store
+          .dispatch("register", {
+            firstName,
+            lastName,
+            middleName,
+            position,
+            employmentDate,
+            room,
+            login,
+            password
+          })
+          .then(() => {
+            this.showSnack = true;
+            this.snackText = "Доктор создан";
+          });
       }
     }
   }
