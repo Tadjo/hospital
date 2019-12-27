@@ -10,7 +10,7 @@ export default new Vuex.Store({
   state: {
     status: "",
     token: token || "",
-    user: decodeJWT(token) || "",
+    user: token ? decodeJWT(token) : "",
     patients: []
   },
   mutations: {
