@@ -63,12 +63,7 @@ export default {
       return this.$store.getters.isLoggedIn
     },
     items() {
-      const patients =  (this.$store.getters.patients || []).map(p => {
-        p.fio = `${p.firstName} ${p.lastName} ${p.middleName}`,
-        p.datein = p.datein && new Date(p.datein).toLocaleDateString();
-        p.dateout = p.dateout && new Date(p.dateout).toLocaleDateString();
-        return p;
-      });
+      const patients = this.$store.getters.patients || []
       return this.search.trim() ? patients.filter(
         it =>
           it.fio.toLowerCase().includes(this.search.trim().toLowerCase())

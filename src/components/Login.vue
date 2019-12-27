@@ -1,7 +1,7 @@
 <template>
   <div class="login-container" @keyup.enter="submit">
     <h1>HOSPITAL</h1>
-    <v-form ref="form" >
+    <v-form ref="form">
       <v-container>
         <v-row>
           <v-col cols="24">
@@ -29,6 +29,7 @@
         </v-row>
       </v-container>
     </v-form>
+      <v-alert v-if="authError" dense type="error">Неверный логин или пароль</v-alert>
     <div class="login-controls">
       <v-btn @click="submit" color="primary">Войти</v-btn>
     </div>
@@ -44,27 +45,34 @@ export default {
       login: "admin",
       rules: {
         required: value => !!value || "Заполните поле.",
-        loginMin: v => v.length >= 3 || v == 'admin' || "Введите как минимум 3 символов",
-        min: v => v.length >= 8 || v == 'admin' || "Введите как минимум 8 символов",
+        loginMin: v =>
+          v.length >= 3 || v == "admin" || "Введите как минимум 3 символов",
+        min: v =>
+          v.length >= 8 || v == "admin" || "Введите как минимум 8 символов",
         password: v =>
           /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/.test(v) ||
           "Пароль должен содержать как минимум 1 число, 1 маленькую и 1 большую букву"
       }
     };
   },
+  computed: {
+    authError() {
+      return this.$store.getters.authStatus === "error";
+    }
+  },
   methods: {
     submit() {
       // if (this.password === "root" && this.login === "admin") {
       //   this.$router.push("/");
       // } else {
-        if (this.$refs.form.validate()) {
-          this.$store
-            .dispatch("login", { login: this.login, password: this.password })
-            .then(() => this.$router.push("/"))
-            .catch(err => console.log(err));
-        }
+      if (this.$refs.form.validate()) {
+        this.$store
+          .dispatch("login", { login: this.login, password: this.password })
+          .then(() => this.$router.push("/"))
+          .catch(err => console.log(err));
       }
     }
+  }
   // }
 };
 </script>

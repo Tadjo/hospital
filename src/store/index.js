@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
-import decodeJWT from 'jwt-decode'
+import decodeJWT from "jwt-decode";
 
 Vue.use(Vuex);
 const token = localStorage.getItem("token");
@@ -81,7 +81,7 @@ export default new Vuex.Store({
         resolve();
       });
     },
-    createPatient({ dispatch}, patient) {
+    createPatient({ dispatch }, patient) {
       axios({
         url: "http://localhost:8081/patients",
         data: patient,
@@ -95,7 +95,13 @@ export default new Vuex.Store({
         url: "http://localhost:8081/patients",
         method: "GET"
       }).then(res => {
-        commit("get_patients", res.data.data);
+        const patients = (res.data.data || []).map(p => {
+          (p.fio = `${p.firstName} ${p.lastName} ${p.middleName}`),
+            (p.datein = p.datein && new Date(p.datein).toLocaleDateString());
+          p.dateout = p.dateout && new Date(p.dateout).toLocaleDateString();
+          return p;
+        });
+        commit("get_patients", patients);
       });
     }
   },
