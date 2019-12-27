@@ -1,6 +1,8 @@
 <template>
   <div class="login-container" @keyup.enter="submit">
-    <h1>HOSPITAL</h1>
+    <router-link to="/">
+      <h1>HOSPITAL</h1>
+    </router-link>
     <v-form ref="form">
       <v-container>
         <v-row>
@@ -29,7 +31,7 @@
         </v-row>
       </v-container>
     </v-form>
-      <v-alert v-if="authError" dense type="error">Неверный логин или пароль</v-alert>
+    <v-alert v-if="authError" dense type="error">Неверный логин или пароль</v-alert>
     <div class="login-controls">
       <v-btn @click="submit" color="primary">Войти</v-btn>
     </div>
@@ -89,5 +91,10 @@ export default {
 }
 .login-container form {
   width: 100%;
+}
+.login-container a {
+  text-decoration: none;
+  color: initial;
+  cursor: pointer;
 }
 </style>
